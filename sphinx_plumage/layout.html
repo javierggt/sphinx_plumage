@@ -1,0 +1,178 @@
+{#
+    plumage/layout.html
+    ~~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for the agogo theme, originally written
+    by Andi Albrecht.
+
+    :copyright: Copyright 2007-2018 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "basic/layout.html" %}
+
+
+{%- macro relbar() %}
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>{{ _('Navigation') }}</h3>
+      <ul>
+        {%- for rellink in rellinks %}
+        <li class="right" {% if loop.first %}style="margin-right: 10px"{% endif %}>
+          <a href="{{ pathto(rellink[0]) }}" title="{{ rellink[1]|striptags|e }}"
+             {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
+          {%- if not loop.first %}{{ reldelim2 }}{% endif %}</li>
+        {%- endfor %}
+        {%- block rootrellink %}
+        <li class="nav-item nav-item-0"><a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a>{{ reldelim1 }}</li>
+        {%- endblock %}
+        {%- for parent in parents %}
+          <li class="nav-item nav-item-{{ loop.index }}"><a href="{{ parent.link|e }}" {% if loop.last %}{{ accesskey("U") }}{% endif %}>{{ parent.title }}</a>{{ reldelim1 }}</li>
+        {%- endfor %}
+        {%- block relbaritems %} {% endblock %}
+      </ul>
+    </div>
+{%- endmacro %}
+
+{%- macro my_sidebar() %}
+    <div class="well">
+      {%- block sidebartoc %}
+      <h3>{{ _('Table of Contents') }}</h3>
+      {{ toctree() }}
+      {%- endblock %}
+      {%- block sidebarsearch %}
+      <div role="search">
+        <h3 style="margin-top: 1.5em;">{{ _('Search') }}</h3>
+        <form class="search" action="{{ pathto('search') }}" method="get">
+          <input type="text" name="q" />
+          <input type="submit" value="{{ _('Go') }}" />
+        </form>
+      </div>
+      {%- endblock %}
+    </div>
+
+{%- endmacro %}
+
+{%- macro search_form() %}
+    <form class="navbar-form navbar-right" role="search" action="{{ pathto('search') }}" method="get">
+      <div class="form-group">
+        <div class="input-group">
+          <input type="text" name="q" placeholder="Search" />
+          <input type="submit" value="{{ _('Go') }}" />
+        </div>
+      </div>
+    </form>
+{%- endmacro %}
+
+
+{%- block extrahead %}
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css"/>
+    <link rel="stylesheet" href="{{ pathto('_static/css/pygment-solarized-dark.css', 1) }}"/>
+    <link rel="stylesheet" href="{{ pathto('_static/css/jquery.mglass.css', 1) }}"/>
+    <link rel="stylesheet" href="{{ pathto('_static/css/style.css', 1) }}"/>
+
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
+    <link href='https://fonts.googleapis.com/css?family=Istok+Web' rel='stylesheet' type='text/css'/>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'/>
+
+    <link rel="icon" href="{{ pathto('favicon.ico', 1) }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ pathto('favicon.ico', 1) }}" type="image/x-icon">
+{%- endblock %}
+
+
+{%- block header %}
+    <div class="container"> <!-- this will be closed in footer -->
+      <div class="page-header">
+        {% if theme_site_thumbnail %}
+          <a href="{{ pathto(master_doc) }}" class="avatar-container pull-left">
+            <div class="avatar {% if theme_site_thumbnail_text != '' %} animate {% endif %}">
+              <div class="side"><img src="{{ pathto('_static/' +theme_site_thumbnail, 1) }}" class="img-responsive"/></div>
+              {% if theme_site_thumbnail_text != '' %}
+                <div class="side back"><p class="text-center">{{ theme_site_thumbnail_text }}</p></div>
+              {% endif %}
+            </div>
+          </a>
+        {% endif %}
+        <h1><a href="{{ pathto(master_doc) }}">{{ project }}</a> </h1>
+      </div>
+
+      <nav class="navbar navbar-default">
+
+        <!-- Hamburger menu for mobile -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#plumage-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ pathto(master_doc) }}" title="{{ project }}">{{ project }}</a>
+        </div>
+
+        <!-- Menus and search forms -->
+        <div class="collapse navbar-collapse" id="plumage-navbar-collapse-1">
+
+          <ul class="nav navbar-nav">
+            {%- for rellink in theme_header_links|reverse %}
+            <li>
+              <a href="{{ rellink[1] }}" title="{{ rellink[2] }}">{{ rellink[0] }}</a>
+            </li>
+            {%- endfor %}
+          </ul>
+
+        </div>
+
+      </nav>
+
+    </div> <!-- closes div class container that should be in header block -->
+{%- endblock %}
+
+
+
+{%- block content %}
+    <div class="container main">
+
+      <div class="row">
+        <div class="col-md-12">
+          {% block top_center %}
+          {% endblock %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-9" id="content" role="main">
+          {% block body %} {% endblock %}
+        </div>
+
+        <div class="col-md-3">
+          {% block right_sidebar %}
+          {{ my_sidebar() }}
+          {% endblock %}
+          {{ RIGHT_SIDEBAR }}
+        </div>
+
+      </div>
+
+    </div>
+{%- endblock %}
+
+
+{%- block footer %}
+{%- endblock %}
+
+{%- block relbar1 %}
+    <div class="container">
+      {{ relbar() }}
+    </div>
+{% endblock %}
+
+{%- block relbar2 %}
+    <div class="container">
+      {{ relbar() }}
+    </div>
+{% endblock %}
+
+
+
